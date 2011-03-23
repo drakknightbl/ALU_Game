@@ -10,12 +10,14 @@ import com.alu.alice_game.server.MultiPlayerAwsSupportImpl;
 import com.alu.alice_game.server.MultiPlayerStubSupportImpl;
 import com.alu.alice_game.server.MultiPlayerServerSupportImpl;
 import com.alu.alice_game.server.MultiPlayerSupport;
+import com.alu.alice_game.dialog.ServerAddressDialog;
 import com.alu.alice_game.domain.Player;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -23,6 +25,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -36,6 +40,10 @@ import android.widget.Toast;
 public class Main extends Activity {
 	
 	//private static int IMAGE_POSITION_TAG = 0;
+	
+	private static final int SERVER_ADDRESS_MENU = 1;
+	private static final int EXIT_MENU = 0;
+	private static String serverAddress = "http://127.0.0.1:8083/";
 
         public static BasicAWSCredentials credentials = null;
 
@@ -79,6 +87,61 @@ public class Main extends Activity {
 	private Player player2;
 	private Player sendPlayer;
 	private Player receivePlayer ;
+	
+	////////Dialog Stuff///////////
+	
+	private void exitApp(){
+		this.multiPlayerSupport.onFinish();
+		this.finish();
+	}
+	
+	
+	//Set the ServerAddress of this Class
+	public void setServerAddress(String address){
+		this.serverAddress =address;
+		Log.i("Main", "Server Address set to " + serverAddress);
+	}
+	
+	public String getServerAddress(){
+		return this.serverAddress;
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id){
+		switch(id){
+			
+		case SERVER_ADDRESS_MENU:
+			return new ServerAddressDialog(this).create();
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		menu.add(0, SERVER_ADDRESS_MENU,0,R.string.server_address_menu);
+		
+		menu.add(0, EXIT_MENU, 0, R.string.exit_menu);
+		
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+		case EXIT_MENU	:
+			this.exitApp();
+			break;
+		case SERVER_ADDRESS_MENU:
+			Main.this.showDialog(SERVER_ADDRESS_MENU); 
+			break;
+		default:
+			Log.i("Main", "onOptionsItemSelected error");
+		}
+		
+		return true;
+	}
+	
+	
+	/////////////////////
 	
 	public Main() {
                 // Non Amazon

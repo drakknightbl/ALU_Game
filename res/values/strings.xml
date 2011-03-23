@@ -3,4 +3,6 @@
     <string name="hello">Hello World, Main!</string>
     <string name="app_name">Space Game</string>
     <string name="image_position_tag">0</string>
+    <string name= "server_address_menu">Address</string>
+    <string name="exit_menu">Exit</string>
 </resources>
