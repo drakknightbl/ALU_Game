@@ -8,6 +8,7 @@ import java.util.Hashtable;
 
 import com.alu.alice_game.domain.Player;
 import com.alu.alice_game.Config;
+import com.alu.alice_game.Main;
 
 import java.util.List;
 import org.apache.http.NameValuePair;
@@ -19,7 +20,19 @@ import android.util.Log;
 
 public class MultiPlayerServerSupportImpl {
 	
+	private static Main main;
+
 	private HttpRequest hr = new HttpRequest();
+	
+	public MultiPlayerServerSupportImpl(){
+		this(main);
+		Log.i("MultiPlayerServerSupportImpl", "Error Wrong Constructor");
+	}
+	
+	public MultiPlayerServerSupportImpl(Main main) {
+		this.main = main;
+	}
+
 	
     public Collection<Player> getOnlinePlayers() {
         Log.i("MultiPlayerServerSupportImpl", "getOnlinePlayers");
@@ -54,11 +67,15 @@ public class MultiPlayerServerSupportImpl {
     }
 
     public void sendMessage(String type, Player player, String message) {
-        Log.i("MultiPlayerServerSupportImpl", "Message \"" + message + "\" is sent to " + player.getName() + " ip 192.168.1.104:8084");
+        
+    	Log.i("MultiPlayerServerSupportImpl", "Message \"" + message + "\" is sent to " + player.getName() + " ip 192.168.1.104:8084");
         
         List<NameValuePair> nvp = new ArrayList<NameValuePair>(1);
         nvp.add(new BasicNameValuePair("message", message));
-        this.hr.post("http://cf.conversationboard.com/alice_"+type, nvp);
+        String url = main.getServerAddress()  + "/alice_" + type;
+        Log.i("MultiPlayerServerSupportImpl", "SendMessage Address:" + url);
+        this.hr.post(url, nvp);
+        //this.hr.post("http://cf.conversationboard.com/alice_"+type, nvp);
          
     }
 
@@ -66,7 +83,10 @@ public class MultiPlayerServerSupportImpl {
     public void checkForMessage(Context ctx, String type) {
         Log.i("MultiPlayerServerSupportImpl", "check for message");
         
-        this.hr.get("http://cf.conversationboard.com/alice_"+type, ctx); 
+        String url = main.getServerAddress() + "/alice_" + type;
+        Log.i("MultiPlayerServerSupportImpl", "CheckMessages Address:" + url);
+        this.hr.get(url, ctx);
+        //this.hr.get("http://cf.conversationboard.com/alice_"+type, ctx); 
     }
 
     

@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,9 +43,15 @@ public class Main extends Activity {
 	
 	//private static int IMAGE_POSITION_TAG = 0;
 	
+	///Dialog Variable/////
 	private static final int SERVER_ADDRESS_MENU = 1;
 	private static final int EXIT_MENU = 0;
-	private static String serverAddress = "http://127.0.0.1:8083/";
+	private static String serverAddress = "http://127.0.0.1:8083";
+	
+	private static SharedPreferences settings;
+	private static final String  PREFS_NAME = "ServerAddressPrefs";
+	
+	////////////
 
         public static BasicAWSCredentials credentials = null;
 
@@ -98,12 +106,27 @@ public class Main extends Activity {
 	
 	//Set the ServerAddress of this Class
 	public void setServerAddress(String address){
-		this.serverAddress =address;
-		Log.i("Main", "Server Address set to " + serverAddress);
+		Editor edit  = settings.edit();
+		edit.putString("serverAddress", address);
+		if(edit.commit()){
+			Log.i("Main","");
+		}
+			this.serverAddress =address;
+		Log.i("Main", "Server Address set to " + address);
 	}
 	
 	public String getServerAddress(){
-		return this.serverAddress;
+		//Setting Preferences////
+        ///Retrieving Server Address
+        settings = getSharedPreferences(PREFS_NAME, 0);
+        String tempAddress = settings.getString("serverAddress", "");
+        if(tempAddress.equals("")){
+        	return serverAddress;
+        }else {
+        	return tempAddress;
+        }
+		
+		//return this.serverAddress;
 	}
 	
 	@Override
@@ -164,7 +187,7 @@ public class Main extends Activity {
 		public void run() {
 			Main m = (Main) cxt;
 		}
-		
+								
 	}
 	
 	
@@ -791,7 +814,7 @@ public class Main extends Activity {
         	Config.MY_PLAYER_TYPE = Config.GUEST_PLAYER_TYPE;
         }
          
-        multiPlayerSupport = new MultiPlayerServerSupportImpl();
+        multiPlayerSupport = new MultiPlayerServerSupportImpl(this);
         if(Config.MY_PLAYER_TYPE==Config.CREATOR_PLAYER_TYPE) {
             isSender = true;
         } else {
